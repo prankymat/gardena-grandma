@@ -6,7 +6,7 @@ var io = require('socket.io')(http);
 const ROOT = __dirname;
 
 app.get('/', function(req, res){
-  res.sendFile('./static/index.html', {root: ROOT});
+  res.sendFile('static/index.html', {root: ROOT});
 });
 
 io.on('connection', function(socket){
