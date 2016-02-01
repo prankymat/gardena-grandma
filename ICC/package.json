@@ -1,0 +1,24 @@
+{
+  "name": "ICC",
+  "version": "0.0.0",
+  "description": "Internet Connection Checker",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ICC",
+    "Internet",
+    "Connection",
+    "Checker",
+    "Bitches",
+    "Gardena"
+  ],
+  "author": "prankymat",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "express": "~4.13.4",
+    "socket.io": "~1.4.5",
+    "bull": "~0.7.0"
+  }
+}

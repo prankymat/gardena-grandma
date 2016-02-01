@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>ICC @ Gardena Drive</title>
+  </head>
+  <body>
+
+    <div class="">
+      <p>Connection status: <span id="connection_status">FAILED</span></p>
+      <p>Last update: <span id="connection_timestamp">Not updated</span></p>
+    </div>
+
+    <script src="/js/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+
+      Date.prototype.timeNow = function () {
+        return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+      }
+
+      socket.on('internet connection status', function(msg){
+        $("#connection_status").text(msg.status);
+        $("#connection_timestamp").text(new Date().timeNow());
+      });
+    </script>
+  </body>
+</html>
