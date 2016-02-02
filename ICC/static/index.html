@@ -5,9 +5,17 @@
   </head>
   <body>
 
-    <div class="">
-      <p>Connection status: <span id="connection_status">FAILED</span></p>
+    <div id="server_connection_failed" hidden>
+      <h1>Connection to server failed!</h1>
+      <p>
+          Please reload this page moments later.
+      </p>
+    </div>
+
+    <div id="ICC_body">
+      <p>Internet Connection: <span id="connection_status">Unknown</span></p>
       <p>Last update: <span id="connection_timestamp">Not updated</span></p>
+      <button id="check_internet_connection">Check now</button>
     </div>
 
     <script src="/js/socket.io.js"></script>
@@ -15,13 +23,36 @@
     <script>
       var socket = io();
 
+      function getStatusLight(color) {
+        color || (color = '#e74c3c');
+        return '<svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="' + color + '"/>OK</svg>'
+      }
+
+      // returns human readable time string (24hrs)
       Date.prototype.timeNow = function () {
         return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
       }
 
       socket.on('internet connection status', function(msg){
-        $("#connection_status").text(msg.status);
+        // got status update from server
+        $("#connection_status").html(getStatusLight({'ok': '#29b463', 'checking': '#f1c615'}[msg.status]));
         $("#connection_timestamp").text(new Date().timeNow());
+      });
+
+      socket.on('disconnect', function() {
+        // disconnected with server
+        $("#server_connection_failed").show();
+        $("#ICC_body").hide();
+      });
+
+      socket.on('reconnect', function() {
+        // reconnect was successful
+        $("#server_connection_failed").hide();
+        $("#ICC_body").show();
+      });
+
+      $("#check_internet_connection").click(function(){
+        socket.emit('check internet connection');
       });
     </script>
   </body>
