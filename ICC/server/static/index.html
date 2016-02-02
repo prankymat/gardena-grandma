@@ -19,7 +19,9 @@
     </div>
 
     <script src="/js/socket.io.js"></script>
-    <script src="/js/jquery.js"></script>
+
+    <script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
+
     <script>
       var socket = io();
 
