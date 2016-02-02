@@ -1,6 +1,6 @@
 {
   "name": "ICC",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Internet Connection Checker",
   "main": "main.js",
   "scripts": {
@@ -20,5 +20,8 @@
     "express": "~4.13.4",
     "socket.io": "~1.4.5",
     "is-online": "~5.0.1"
+  },
+  "scripts": {
+    "start": "node main.js"
   }
 }
