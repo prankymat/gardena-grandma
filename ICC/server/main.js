@@ -3,7 +3,8 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-const InternetConnectionChecker = require('./internetConnectionChecker.js')
+const InternetConnectionChecker = require('./internetConnectionChecker.js');
+const DatabaseManager = require('./DatabaseManager.js');
 
 const ROOT = __dirname;
 
@@ -18,6 +19,12 @@ io.on('connection', function(socket){
   socket.on('check internet connection', function() {
     internetChecker.check();
   });
+
+  socket.on('retrieve histories', function() {
+    dbManager.getAllHistories(function(histories) {
+      io.emit('histories', histories);
+    });
+  });
 });
 
 var internetChecker = new InternetConnectionChecker();
@@ -27,13 +34,27 @@ internetChecker.on('checking', function() {
 });
 
 internetChecker.on('finished', function(status) {
-  io.emit('internet connection status', status)
+  io.emit('internet connection status', status);
+
+  if (status.status != "ok") {
+    dbManager.logOffline();
+  } else {
+    dbManager.logOnline();
+  }
 });
 
+var dbManager = new DatabaseManager();
+
+dbManager.on('history-added', function() {
+  dbManager.getAllHistories(function(histories) {
+    io.emit('histories', histories);
+  });
+});
 
 // regular internet connection check
 setInterval(function() {
   internetChecker.check();
+  // io.emit('histories', [{tfrom: "02/03/2016 15:00:00", tto: "02/03/2016 15:05:00"}, {tfrom: "02/03/2016 15:00:00", tto: "02/03/2016 15:05:00"}, {tfrom: "02/03/2016 15:00:00", tto: "02/03/2016 15:05:00"}])
 }, 1000);
 
 
