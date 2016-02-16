@@ -34,7 +34,7 @@ function DatabaseManager() {
   ee.logOffline = function() {
     var now = moment();
 
-    if ((now - cutoff) > 1000) {
+    if ((now - cutoff) > 3000) {
       db.run("INSERT OR REPLACE INTO Histories (tfrom, tto) VALUES (?, ?)", [cutoff.format(),now.format(),])
       ee.emit('history-added');
     }
