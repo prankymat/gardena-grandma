@@ -19,6 +19,7 @@
 
       <br />
       <h3>Offline records</h3>
+      <p>Count: <span id="count">0</span></p>
       <button id="reload_table">Reload table</button>
       <table border=1 id="offline-history">
         <tr id="head">
@@ -35,6 +36,19 @@
     <script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
 
     <script>
+	
+	  function humanifyTimeDiff(a, b) {
+	  	var seconds = b.diff(a, 'seconds');
+		var r_seconds = seconds % 60;
+		var minutes = Math.trunc(seconds/60);
+		if (r_seconds == 0) {
+			return minutes + " minutes";
+		} else if (minutes == 0) {
+			return seconds + " seconds";
+		} else {
+			return minutes + " minutes and " + r_seconds + " seconds";
+		}
+	  }
 
       function addHistory(history) {
         var table = document.getElementById("offline-history");
@@ -49,7 +63,7 @@
 
         cell1.innerHTML = tfrom.format('L');
         cell2.innerHTML = tfrom.format('HH:mm:ss') + ' - ' + tto.format('HH:mm:ss');
-        cell3.innerHTML = tto.from(tfrom, true);
+        cell3.innerHTML = humanifyTimeDiff(tfrom,tto);
       };
 
       var socket = io();
@@ -90,6 +104,8 @@
 
       socket.on('histories', function(histories) {
         $("#offline-history tr:not(#head)").remove();
+	histories.reverse();
+	$("#count").text(histories.length);
         for (var history in histories) {
           addHistory(histories[history]);
         }
