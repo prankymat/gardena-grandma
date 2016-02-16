@@ -41,7 +41,18 @@
 	  	var seconds = b.diff(a, 'seconds');
 		var r_seconds = seconds % 60;
 		var minutes = Math.trunc(seconds/60);
-		if (r_seconds == 0) {
+
+		var r_minutes = minutes % 60;
+		var hours = Math.trunc(minutes/60);
+		if (hours > 0) {
+			if (r_minutes == 0) {
+				return hours + " hours";
+			} else if (r_seconds == 0) {
+				return hours + " hours and " + r_minutes + " minutes";
+			} else {
+				return hours + " hours and " + r_minutes + " minutes and " + r_seconds + " seconds";
+			}
+		} else if (r_seconds == 0) {
 			return minutes + " minutes";
 		} else if (minutes == 0) {
 			return seconds + " seconds";
