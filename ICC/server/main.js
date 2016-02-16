@@ -4,7 +4,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
 const InternetConnectionChecker = require('./internetConnectionChecker.js');
-const DatabaseManager = require('./DatabaseManager.js');
+const DatabaseManager = require('./databaseManager.js');
 
 const ROOT = __dirname;
 
