@@ -1,0 +1,9 @@
+td, th {
+    min-width: 100px;
+    padding: 0 5px 0 5px;
+}
+
+body {
+  padding-top: 50px;
+  min-width: 800px;
+}
