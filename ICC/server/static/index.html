@@ -35,15 +35,15 @@
     <div class="col-md-6 col-lg-6 fixed">
       <h1>Select Timeframe</h1>
 
-      <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-primary active">
-          <input type="radio" name="options" id="option1" autocomplete="off" checked> Within 24 Hours
+      <div class="btn-group" data-toggle="buttons" id="time-frame-options">
+        <label class="btn btn-primary active" id="24">
+          <input type="radio" name="options" autocomplete="off" checked> Within 24 Hours
         </label>
-        <label class="btn btn-primary">
-          <input type="radio" name="options" id="option2" autocomplete="off"> Within 48 Hours
+        <label class="btn btn-primary" id="48">
+          <input type="radio" name="options" autocomplete="off"> Within 48 Hours
         </label>
-        <label class="btn btn-primary">
-          <input type="radio" name="options" id="option3" autocomplete="off"> Within 72 Hours
+        <label class="btn btn-primary" id="72">
+          <input type="radio" name="options" autocomplete="off"> Within 72 Hours
         </label>
       </div>
 
@@ -63,8 +63,10 @@
   <script src="/js/socket.io.js"></script>
   <script src="/js/moment.min.js"></script>
 
-  <script type="text/javascript" src="js/jquery.js" onload="window.$ = window.jQuery = module.exports;"></script>
+  <script type="text/javascript" src="js/jquery.js" onload="if (typeof(module) != 'undefined') { window.$ = window.jQuery = module.exports; }"></script>
   <script src="/js/bootstrap.min.js"></script>
+
+  <script src="/js/EventEmitter.min.js"></script>
 
   <script src="/js/main.js"></script>
 </body>

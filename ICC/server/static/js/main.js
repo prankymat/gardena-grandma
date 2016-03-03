@@ -1,3 +1,39 @@
+Array.prototype.diff = function(a) {
+  return this.filter(function(obj1) {
+    return !a.some(function(obj2) {
+      return !Object.is(obj1, obj2);
+    })
+  })
+};
+
+
+function HistoryManager() {
+  const manager = new EventEmitter();
+
+  var histories = [];
+
+  manager.getAllHistories = function() {
+    return histories;
+  };
+
+  manager.setHistories = function(new_histories) {
+    var difference = new_histories.diff(histories);
+    if (difference.length > 0) {
+        histories = new_histories;
+        console.log("diff", difference)
+        manager.emit('histories-changed', difference);
+    }
+  };
+
+  manager.getWithinHours = function(hours) {
+    return histories.filter(function(entry) {
+      return moment(entry.tfrom).isAfter(hours, 'hours');
+    });
+  };
+
+  return manager;
+}
+
 function humanifyTimeDiff(a, b) {
   var seconds = b.diff(a, 'seconds');
   var r_seconds = seconds % 60;
@@ -22,23 +58,36 @@ function humanifyTimeDiff(a, b) {
   }
 }
 
-function addHistory(history, element) {
+function addHistories(histories, element, count) {
   var table = document.getElementById(element);
-  var row = table.insertRow();
 
-  var cell1 = row.insertCell(0);
-  var cell2 = row.insertCell(1);
-  var cell3 = row.insertCell(2);
+  $("#" + element + " tr:not(#head)").remove();
+  $("#" + count).text(histories.length);
 
-  var tfrom = moment(history.tfrom);
-  var tto = moment(history.tto);
+  for (var history in histories) {
+    history = histories[history];
 
-  cell1.innerHTML = tfrom.format('L');
-  cell2.innerHTML = tfrom.format('HH:mm:ss') + ' - ' + tto.format('HH:mm:ss');
-  cell3.innerHTML = humanifyTimeDiff(tfrom,tto);
+    var row = table.insertRow();
+
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+
+    var tfrom = moment(history.tfrom);
+    var tto = moment(history.tto);
+
+    cell1.innerHTML = tfrom.format('L');
+    cell2.innerHTML = tfrom.format('HH:mm:ss') + ' - ' + tto.format('HH:mm:ss');
+    cell3.innerHTML = humanifyTimeDiff(tfrom,tto);
+  }
 };
 
-var socket = io();
+
+var historyManager = HistoryManager();
+
+historyManager.on("histories-changed", function(histories) {
+  addHistories(histories, 'all-offline-history', "all_count");
+});
 
 function getStatusLight(color) {
   color || (color = '#e74c3c');
@@ -49,7 +98,7 @@ function getStatusLight(color) {
 Date.prototype.timeNow = function () {
   return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
 }
-
+var socket = io();
 socket.on('internet connection status', function(msg){
   // got status update from server
   $("#connection_status").html(getStatusLight({'ok': '#29b463', 'checking': '#f1c615'}[msg.status]));
@@ -75,12 +124,7 @@ socket.on('connect', function(){
 });
 
 socket.on('histories', function(histories) {
-  $("#all-offline-history tr:not(#head)").remove();
-  histories.reverse();
-  $("#all_count").text(histories.length);
-  for (var history in histories) {
-    addHistory(histories[history], "all-offline-history");
-  }
+  historyManager.setHistories(histories);
 });
 
 $("#check_internet_connection").click(function(){
@@ -89,4 +133,11 @@ $("#check_internet_connection").click(function(){
 
 $("#reload_table").click(function() {
   socket.emit('retrieve histories');
+});
+
+$("#24, #48, #72").click(function(){
+  var range = $(this).attr('id');
+  var filtered = historyManager.getWithinHours(range);
+
+  addHistories(filtered, 'filtered-offline-history', 'filtered_count');
 });
