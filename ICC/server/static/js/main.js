@@ -1,34 +1,34 @@
-Array.prototype.diff = function(a) {
-  return this.filter(function(obj1) {
-    return !a.some(function(obj2) {
-      return !Object.is(obj1, obj2);
-    })
-  })
-};
-
-
 function HistoryManager() {
   const manager = new EventEmitter();
 
-  var histories = [];
+  var histories = TAFFY();
 
   manager.getAllHistories = function() {
-    return histories;
+    return histories();
   };
 
   manager.setHistories = function(new_histories) {
-    var difference = new_histories.diff(histories);
-    if (difference.length > 0) {
-        histories = new_histories;
-        console.log("diff", difference)
-        manager.emit('histories-changed', difference);
+    new_histories.reverse();
+    var difference = [];
+    for (var history in new_histories) {
+      var h = new_histories[history];
+      if (histories({tfrom: h.tfrom}).get().length <= 0) {
+        difference.push(h);
+      }
+
+      histories({tfrom: h.tfrom}).update(h);
     }
+    manager.emit('histories-changed', difference);
+
+    console.log(difference)
   };
 
   manager.getWithinHours = function(hours) {
-    return histories.filter(function(entry) {
+    var filtered = histories().get().filter(function(entry) {
       return moment(entry.tfrom).isAfter(hours, 'hours');
     });
+    console.log("filtered", filtered);
+    return filtered;
   };
 
   return manager;
@@ -65,7 +65,7 @@ function addHistories(histories, element, count) {
   $("#" + count).text(histories.length);
 
   for (var history in histories) {
-    history = histories[history];
+    var h = histories[history];
 
     var row = table.insertRow();
 
@@ -73,8 +73,8 @@ function addHistories(histories, element, count) {
     var cell2 = row.insertCell(1);
     var cell3 = row.insertCell(2);
 
-    var tfrom = moment(history.tfrom);
-    var tto = moment(history.tto);
+    var tfrom = moment(h.tfrom);
+    var tto = moment(h.tto);
 
     cell1.innerHTML = tfrom.format('L');
     cell2.innerHTML = tfrom.format('HH:mm:ss') + ' - ' + tto.format('HH:mm:ss');
