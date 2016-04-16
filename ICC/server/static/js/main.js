@@ -8,7 +8,7 @@ function HistoryManager() {
   };
 
   manager.setHistories = function(new_histories) {
-    new_histories.reverse();
+    new_histories && new_histories.reverse();
     var difference = [];
     for (var history in new_histories) {
       var h = new_histories[history];
